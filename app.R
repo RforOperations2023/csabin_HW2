@@ -112,8 +112,9 @@ ui <- fluidPage(
         ),
                   
     # Main Panel
-        mainPanel(
-            valueBoxOutput("totalannualemissions")
+        dashboardBody(
+#            valueBoxOutput("totalannualemissions")
+             infoBoxOutput("useryear")
         )
     )
 )
@@ -123,7 +124,7 @@ ui <- fluidPage(
 
 # Server
 
-server <- function(input, output) {}
+server <- function(input, output) {
     
     # Create a reactive subset containing data from the user-selected year
     # Add three columns: total emissions by source, by sector, and by year
@@ -157,13 +158,24 @@ server <- function(input, output) {}
 #    })
     
     # Output: Value box showing the total emissions in user-selected year
-    output$totalannualemissions <- renderValueBox({
-          valueBox(dcemissions[5], 
-                 "Total Annual Emissions",
-                 icon = icon("leaf", lib = "fontawesome"),
-                 color = "green")
-    })  
+#    output$totalannualemissions <- renderValueBox({
+#          valueBox(dcemissions[5], 
+#                 "Total Annual Emissions",
+#                 icon = icon("leaf", lib = "fontawesome"),
+#                 color = "green")
+#    })  
 
+    
+    # Output: Info box showing the user-selected year
+    output$useryear <- renderInfoBox({
+        infoBox("Year", value = input$selected_year,
+                subtitle = "selected by the user",
+                icon = icon("leaf"), 
+                color = "green", fill = TRUE)
+    })
+    
+}
+    
 # Call ShinyApp
     
 shinyApp(ui = ui, server = server)
