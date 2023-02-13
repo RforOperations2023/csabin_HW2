@@ -124,8 +124,23 @@ ui <- fluidPage(
 
 server <- function(input, output) {}
     
-    
-
+    # Create a reactive subset containing data from the user-selected year
+    # Add two columns to show total emissions by source, and by sector
+    emissions_chosenyear <- reactive({
+        req(input$selected_year)
+      
+        sector_chosenyear <- dcemissions %>% 
+            filter(year == input$selected_year) %>%
+            group_by(sector, year) %>%
+            mutate(sector_emissions = sum(emissions, na.rm = TRUE)) %>% 
+            ungroup() 
+      
+        source_chosenyear <- sector_chosenyear %>%
+            filter(year == input$selected_year) %>%
+            group_by(source, year) %>%
+            mutate(source_emissions = sum(emissions, na.rm = TRUE))
+    })
+  
 
 # Call ShinyApp
     
