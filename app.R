@@ -56,15 +56,11 @@ dcemissions$sector <- recode_factor(dcemissions$sector,
 dcemissions$source <- recode_factor(dcemissions$source, 
                           "Biodiesel" = "Diesel",
                           "CNG" = "Natural Gas",
+                          "Fossil Gas Distribution" = "Natural Gas",
                           "Gas" = "Gasoline",
                           "Process Emissions" = "Fugitive Emissions")
                           
                           
-                           
-
-
-
-
 
 ##### SHINY APP CHUNKS #####
 
@@ -90,19 +86,12 @@ ui <- fluidPage(
             selectInput(inputId = "sectors",
                         label = "Selected sector(s): ",
                         choices = c(
-                               "Buildings & Energy: Non-Residential",
-                               "Buildings & Energy: Residential",
                                "Buildings & Facilities",
                                "Employee Commute",
-                               "Fleet: DC Circulator",
-                               "Fleet: DC Circulator & DC Streetcar Electricity",
-                               "Fleet: On-Road",
+                               "Fleet",
                                "Fugitive Emissions",
-                               "Grid Loss: Water & Wastewater",
-                               "Solid Waste",
                                "Streetlights & Traffic Signals",
                                "Transportation",
-                               "Transportation: Transit",
                                "Waste",
                                "Water & Wastewater"),
                         selected = "Transportation"),
@@ -110,14 +99,12 @@ ui <- fluidPage(
             # Input: allow user to select source(s) to look at
             selectInput(inputId = "sectors",
                         label = "Selected sector(s): ",
-                        choices = c("Fuel Oil", "Steam", "Grid Loss",
-                                    "Electricity", "Gas", "Compost",
-                                     "Incineration", "Kerosene",
-                                     "Fossil Gas Distribution",
-                                     "Diesel", "Gasoline", "Landfill",
-                                     "Process Emissions", "CNG", 
-                                     "Fugitive Emissions","Natural Gas",
-                                     "Biodiesel", "Ethanol"),
+                        choices = c("Compost", "Diesel", 
+                                    "Electricity", "Ethanol",
+                                    "Fuel Oil", "Fugitive Emissions",
+                                    "Gasoline", "Grid Loss", 
+                                    "Incineration", "Kerosene", "Landfill", 
+                                    "Natural Gas", "Steam"),
                         selected = "Electricity")
         ),
                   
