@@ -32,8 +32,35 @@ ghg_inventory <- data.frame(ghg_inventory)
 # Change variables to factors
 ghg_inventory$inventory <- as.factor(ghg_inventory$inventory)
 ghg_inventory$sector <- as.factor(ghg_inventory$sector)
+ghg_inventory$source <- as.factor(ghg_inventory$source)
 ghg_inventory$year <- as.factor(ghg_inventory$year)
 
+
+# Create a subset of citywide emissions
+dcemissions <- ghg_inventory %>%
+                  select("inventory", "sector", "source", "year", "emissions") %>%
+                  filter(inventory == "Citywide")
+
+# Combine similar sectors into roll-up categories
+dcemissions$sector <- recode_factor(dcemissions$sector, 
+                          "Buildings & Energy: Non-Residential" = "Buildings & Facilities", 
+                          "Buildings & Energy: Residential" = "Buildings & Facilities", 
+                          "Fleet: DC Circulator" = "Fleet", 
+                          "Fleet: DC Circulator & DC Streetcar Electricity" = "Fleet", 
+                          "Fleet: On-Road" = "Fleet", 
+                          "Grid Loss: Water & Wastewater" = "Water & Wastewater", 
+                          "Solid Waste" = "Waste", 
+                          "Transportation: Transit" = "Transportation")
+
+# Combine similar sources into roll-up categories
+dcemissions$source <- recode_factor(dcemissions$source, 
+                          "Biodiesel" = "Diesel",
+                          "CNG" = "Natural Gas",
+                          "Gas" = "Gasoline",
+                          "Process Emissions" = "Fugitive Emissions")
+                          
+                          
+                           
 
 
 
