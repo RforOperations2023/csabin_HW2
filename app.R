@@ -9,6 +9,7 @@
 # Load libraries ----------------------------------------------------------
 library(shiny)
 library(shinythemes)
+library(shinydashboard)
 library(readr)
 library(dplyr)
 library(ggplot2)
@@ -81,14 +82,14 @@ ui <- fluidPage(
         sidebarPanel(
                     
             # Input: allow user to choose a range of years
-            radioButtons(inputId = "years_selected", label = "Year: ",
+            radioButtons(inputId = "selected_year", label = "Year: ",
                          choices = c("2006", "2009", "2010", "2011", 
                                      "2012", "2013", "2014", "2015",
                                      "2016", "2017", "2018", "2019", "2020"),
                               selected = "2020"),
             
             # Input: allow user to select sectors to look at
-            selectInput(inputId = "sectors",
+            selectInput(inputId = "selected_sector",
                         label = "Selected sector(s): ",
                         choices = c(
                                "Buildings & Facilities",
@@ -99,8 +100,8 @@ ui <- fluidPage(
                         selected = "Transportation"),
             
             # Input: allow user to select source(s) to look at
-            selectInput(inputId = "sectors",
-                        label = "Selected sector(s): ",
+            selectInput(inputId = "selected_source",
+                        label = "Selected source(s): ",
                         choices = c("Compost", "Diesel", 
                                     "Electricity",
                                     "Fuel Oil", "Fugitive Emissions",
@@ -112,8 +113,8 @@ ui <- fluidPage(
                   
     # Main Panel
         mainPanel(
-            # Outputs
-                  )
+            valueBoxOutput("totalannualemissions")
+        )
     )
 )
 
@@ -125,7 +126,7 @@ ui <- fluidPage(
 server <- function(input, output) {}
     
     # Create a reactive subset containing data from the user-selected year
-    # Add two columns to show total emissions by source, and by sector
+    # Add three columns: total emissions by source, by sector, and by year
     emissions_chosenyear <- reactive({
         req(input$selected_year)
       
@@ -138,9 +139,30 @@ server <- function(input, output) {}
         source_chosenyear <- sector_chosenyear %>%
             filter(year == input$selected_year) %>%
             group_by(source, year) %>%
-            mutate(source_emissions = sum(emissions, na.rm = TRUE))
+            mutate(source_emissions = sum(emissions, na.rm = TRUE)) %>%
+            ungroup()
+        
+        total_chosenyear <- source_chosenyear %>%
+            filter(year == input$selected_year) %>%
+            group_by(year) %>%
+            mutate(annual_emissions = sum(emissions, na.rm = TRUE))
     })
-  
+    
+    # Create a reactive Value to retrieve the annual emissions for selected year
+#    annualemissions_chosenyear <- reactiveValues({
+#        req(input$selected_year)
+#      
+#        totalemissions <- emissions_chosenyear()$annual_emissions[1]
+#      
+#    })
+    
+    # Output: Value box showing the total emissions in user-selected year
+    output$totalannualemissions <- renderValueBox({
+          valueBox(dcemissions[5], 
+                 "Total Annual Emissions",
+                 icon = icon("leaf", lib = "fontawesome"),
+                 color = "green")
+    })  
 
 # Call ShinyApp
     
