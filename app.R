@@ -43,16 +43,55 @@ ghg_inventory$year <- as.factor(ghg_inventory$year)
 
 # User Interface
 
-ui <- fluidPage(theme = shinytheme("cosmo"),
+ui <- fluidPage(
                 
     # Title
-    titlePanel("Washington D.C. Citywide Greenhouse Gas Emissions: 2006-2020")
+    title <- titlePanel("Washington D.C. Citywide Greenhouse Gas Emissions"),
                 
     # Sidebar
     sidebarLayout(
         sidebarPanel(
                     
-            # Inputs
+            # Input: allow user to choose a range of years
+            radioButtons(inputId = "years_selected", label = "Year: ",
+                         choices = c("2006", "2009", "2010", "2011", 
+                                     "2012", "2013", "2014", "2015",
+                                     "2016", "2017", "2018", "2019", "2020"),
+                              selected = "2020"),
+            
+            # Input: allow user to select sectors to look at
+            selectInput(inputId = "sectors",
+                        label = "Selected sector(s): ",
+                        choices = c(
+                               "Buildings & Energy: Non-Residential",
+                               "Buildings & Energy: Residential",
+                               "Buildings & Facilities",
+                               "Employee Commute",
+                               "Fleet: DC Circulator",
+                               "Fleet: DC Circulator & DC Streetcar Electricity",
+                               "Fleet: On-Road",
+                               "Fugitive Emissions",
+                               "Grid Loss: Water & Wastewater",
+                               "Solid Waste",
+                               "Streetlights & Traffic Signals",
+                               "Transportation",
+                               "Transportation: Transit",
+                               "Waste",
+                               "Water & Wastewater"),
+                        selected = "Transportation"),
+            
+            # Input: allow user to select source(s) to look at
+            selectInput(inputId = "sectors",
+                        label = "Selected sector(s): ",
+                        choices = c("Fuel Oil", "Steam", "Grid Loss",
+                                    "Electricity", "Gas", "Compost",
+                                     "Incineration", "Kerosene",
+                                     "Fossil Gas Distribution",
+                                     "Diesel", "Gasoline", "Landfill",
+                                     "Process Emissions", "CNG", 
+                                     "Fugitive Emissions","Natural Gas",
+                                     "Biodiesel", "Ethanol"),
+                        selected = "Electricity")
         ),
                   
     # Main Panel
