@@ -65,6 +65,14 @@ dcemissions$source <- recode_factor(dcemissions$source,
 dcemissions$source <- droplevels(dcemissions$source)
 dcemissions$sector <- droplevels(dcemissions$sector)
   
+
+# Create subset showing total emissions for each year
+dcemissions_year <- dcemissions %>%
+                        group_by(year) %>%
+                        mutate(totalemissions = sum(emissions, na.rm = TRUE)) %>%
+                        select(year, totalemissions) %>%
+                        unique()
+                        
                           
                           
 
@@ -113,8 +121,9 @@ ui <- fluidPage(
                   
     # Main Panel
         dashboardBody(
-            valueBoxOutput("totalannualemissions"),
-            valueBoxOutput("useryear")
+              valueBoxOutput("totalannualemissions"),
+              valueBoxOutput("useryear"),
+              box(plotOutput("annualemissions"))
         )
     )
 )
@@ -173,6 +182,12 @@ server <- function(input, output) {
                 "Year (selected by the user)",
                 icon = icon("leaf"), 
                 color = "green")
+    })
+    
+    # Output: bar graph of total emissions by year
+    output$annualemissions <- renderPlot({
+        ggplot(dcemissions_year, aes(x = year, y = totalemissions)) + 
+        geom_col()
     })
     
 }
