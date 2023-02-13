@@ -114,7 +114,7 @@ ui <- fluidPage(
     # Main Panel
         dashboardBody(
             valueBoxOutput("totalannualemissions"),
-             infoBoxOutput("useryear")
+            valueBoxOutput("useryear")
         )
     )
 )
@@ -150,16 +150,17 @@ server <- function(input, output) {
     })
     
     # Create a reactive Value to retrieve the annual emissions for selected year
-#    annualemissions_chosenyear <- reactiveValues({
-#        req(input$selected_year)
-#      
-#        totalemissions <- emissions_chosenyear()$annual_emissions[1]
-#      
-#    })
+    annualemissions_chosenyear <- reactive({
+        req(input$selected_year)
+      
+        totalemissions <- emissions_chosenyear()
+        totalemissions$annual_emissions[1]
+      
+    })
     
     # Output: Value box showing the total emissions in user-selected year
     output$totalannualemissions <- renderValueBox({
-          valueBox(emissions_chosenyear()$annualemissions[5], 
+        valueBox(comma(round(annualemissions_chosenyear(), 0)), 
                  "Total Annual Emissions",
                  icon = icon("bolt", lib = "font-awesome"),
                  color = "green")
@@ -167,11 +168,11 @@ server <- function(input, output) {
 
     
     # Output: Info box showing the user-selected year
-    output$useryear <- renderInfoBox({
-        infoBox("Year", value = input$selected_year,
-                subtitle = "selected by the user",
+    output$useryear <- renderValueBox({
+        valueBox(value = input$selected_year,
+                "Year (selected by the user)",
                 icon = icon("leaf"), 
-                color = "green", fill = TRUE)
+                color = "green")
     })
     
 }
