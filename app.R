@@ -59,6 +59,11 @@ dcemissions$source <- recode_factor(dcemissions$source,
                           "Fossil Gas Distribution" = "Natural Gas",
                           "Gas" = "Gasoline",
                           "Process Emissions" = "Fugitive Emissions")
+
+# Filter out sources and sectors with no related emissions data
+dcemissions$source <- droplevels(dcemissions$source)
+dcemissions$sector <- droplevels(dcemissions$sector)
+  
                           
                           
 
@@ -87,10 +92,7 @@ ui <- fluidPage(
                         label = "Selected sector(s): ",
                         choices = c(
                                "Buildings & Facilities",
-                               "Employee Commute",
-                               "Fleet",
                                "Fugitive Emissions",
-                               "Streetlights & Traffic Signals",
                                "Transportation",
                                "Waste",
                                "Water & Wastewater"),
@@ -100,11 +102,11 @@ ui <- fluidPage(
             selectInput(inputId = "sectors",
                         label = "Selected sector(s): ",
                         choices = c("Compost", "Diesel", 
-                                    "Electricity", "Ethanol",
+                                    "Electricity",
                                     "Fuel Oil", "Fugitive Emissions",
                                     "Gasoline", "Grid Loss", 
-                                    "Incineration", "Kerosene", "Landfill", 
-                                    "Natural Gas", "Steam"),
+                                    "Incineration", "Kerosene", 
+                                    "Landfill", "Natural Gas"),
                         selected = "Electricity")
         ),
                   
