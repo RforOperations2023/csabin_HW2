@@ -113,7 +113,7 @@ ui <- fluidPage(
                   
     # Main Panel
         dashboardBody(
-#            valueBoxOutput("totalannualemissions")
+            valueBoxOutput("totalannualemissions"),
              infoBoxOutput("useryear")
         )
     )
@@ -158,12 +158,12 @@ server <- function(input, output) {
 #    })
     
     # Output: Value box showing the total emissions in user-selected year
-#    output$totalannualemissions <- renderValueBox({
-#          valueBox(dcemissions[5], 
-#                 "Total Annual Emissions",
-#                 icon = icon("leaf", lib = "fontawesome"),
-#                 color = "green")
-#    })  
+    output$totalannualemissions <- renderValueBox({
+          valueBox(emissions_chosenyear()$annualemissions[5], 
+                 "Total Annual Emissions",
+                 icon = icon("bolt", lib = "font-awesome"),
+                 color = "green")
+    })  
 
     
     # Output: Info box showing the user-selected year
