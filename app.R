@@ -127,7 +127,7 @@ ui <- fluidPage(
                  ),
               box(plotOutput("annualemissions")),
               fluidRow(
-#                column(6, valueBoxOutput("emissions_sourcetotal")),
+                column(6, valueBoxOutput("emissions_sourcetotal")),
                 column(6, valueBoxOutput("emissions_sourceyear"))
               )
         )
@@ -222,15 +222,34 @@ server <- function(input, output) {
 
 ##### TAB 2: TOTAL EMISSIONS BY SOURCE AND YEAR #####     
     
-    # Output: Value box showing total emissions for user-selected source 
-#    output$emissions_sourcetotal <- renderValueBox({
-#      valueBox(emissions_chosenyear()$
-#               "Total Annual Emissions",
-#               icon = icon("bolt", lib = "font-awesome"),
-#               color = "green")
-#    })
+    # Output: Value box showing emissions by selected source 
     
-    # Output: Value box showing emissions for selected source in selected year
+        # Create a reactive Value to retrieve the total emissions for source across all years
+        emissions_chosensource <- reactive({
+          req(input$selected_source)
+          
+          source_allyears <- dcemissions %>%
+            group_by(source) %>%
+            mutate(source_emissions = sum(emissions, na.rm = TRUE)) %>%
+            select(source, source_emissions) %>%
+            filter(source == input$selected_source) %>%
+            unique()
+          
+          source_allyears[2]
+        })  
+        
+        # Create value box showing total emissions for selected source and year
+        output$emissions_sourcetotal <- renderValueBox({
+          valueBox(value = prettyNum(round(emissions_chosensource(),0),
+                                     big.mark = ","),
+                   subtitle = paste0("Total Annual Emissions from ", input$selected_source, 
+                                     " Source, 2006 to 2020"),
+                   icon = icon("sun", lib = "font-awesome"),
+                   color = "yellow")
+        })
+    
+  
+    # Output: Value box showing emissions by selected source in selected year
     
         # Create a reactive Value to retrieve the total emissions for source in selected year
         sourceemissions_chosenyear <- reactive({
@@ -247,9 +266,10 @@ server <- function(input, output) {
       
         # Create value box showing total emissions for selected source and year
         output$emissions_sourceyear <- renderValueBox({
-          valueBox(value = round(sourceemissions_chosenyear(),0),
-                   subtitle = paste0("Total Annual Emissions in ", input$selected_source, 
-                          " sector, in ", input$selected_year),
+          valueBox(value = prettyNum(round(sourceemissions_chosenyear(),0),
+                                     big.mark = ","),
+                   subtitle = paste0("Total Annual Emissions from ", input$selected_source, 
+                          " Source, in ", input$selected_year),
                    icon = icon("star", lib = "font-awesome"),
                    color = "yellow")
         })
