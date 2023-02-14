@@ -325,18 +325,18 @@ server <- function(input, output) {
               select(sector, sector_emissions) %>%
               unique()
           
-          sectortotals_chosenyear
+          sectortotals_chosenyear[2]
         })    
         
         # Create value box showing total emissions for selected sector and year
-#        output$emissions_sectoryear <- renderValueBox({
-#          valueBox(value = prettyNum(round(sectoremissions_chosenyear(),0),
-#                                     big.mark = ","),
-#                   subtitle = paste0("Emissions from ", input$selected_source, 
-#                                     " Sector in ", input$selected_year),
-#                   icon = icon("truck", lib = "font-awesome"),
-#                   color = "blue")
-#        })
+        output$emissions_sectoryear <- renderValueBox({
+          valueBox(value = prettyNum(round(sectoremissions_chosenyear(),0),
+                                     big.mark = ","),
+                   subtitle = paste0("Emissions from ", input$selected_sector, 
+                                     " Sector in ", input$selected_year),
+                   icon = icon("truck", lib = "font-awesome"),
+                   color = "blue")
+        })
         
   
     
