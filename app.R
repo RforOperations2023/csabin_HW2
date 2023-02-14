@@ -186,13 +186,20 @@ server <- function(input, output) {
     
     # Output: bar graph of total emissions by year
     output$annualemissions <- renderPlot({
-        ggplot(dcemissions_year, aes(x = year, y = totalemissions)) + 
+        ggplot(dcemissions_year, aes(x = year, y = totalemissions, 
+                                     fill = factor(
+                                       ifelse(year == input$selected_year, 
+                                              "Highlighted", "Normal")
+                                     )
+               )) + 
         geom_col() + 
         labs(title = "Annual Greenhouse Gas Emissions in Washington D.C.") +
         xlab("Year") + ylab("Emissions (millions of tons)") + 
         scale_y_continuous(labels = label_number(scale = 0.000001)) + 
+        scale_fill_manual(values = c("#1d8d43","grey80")) + 
         theme_classic() + 
-        theme(plot.title = element_text(hjust = 0.5, size = 18))
+        theme(plot.title = element_text(hjust = 0.5, size = 18)) +
+        theme(legend.position = "none")
       
     })
     
