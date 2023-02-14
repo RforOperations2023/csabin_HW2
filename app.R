@@ -87,7 +87,7 @@ ui <- fluidPage(
                 
     # Sidebar
     sidebarLayout(
-        sidebarPanel(
+        sidebarPanel(width = 3,
                     
             # Input: allow user to choose a range of years
             radioButtons(inputId = "selected_year", label = "Year: ",
@@ -121,9 +121,15 @@ ui <- fluidPage(
                   
     # Main Panel
         dashboardBody(
-              valueBoxOutput("totalannualemissions"),
-              valueBoxOutput("useryear"),
-              box(plotOutput("annualemissions"))
+              box(
+                valueBoxOutput("totalannualemissions"),
+                valueBoxOutput("useryear")
+                 ),
+              box(plotOutput("annualemissions")),
+              fluidRow(
+#                column(6, valueBoxOutput("emissions_sourcetotal")),
+                column(6, valueBoxOutput("emissions_sourceyear"))
+              )
         )
     )
 )
@@ -164,8 +170,19 @@ server <- function(input, output) {
       
         totalemissions <- emissions_chosenyear()
         totalemissions$annual_emissions[1]
-      
     })
+    
+#    # Create a table to produce table of annual emissions by sector
+#    annualemissions_chosenyear <- reactive({
+#      req(input$selected_year)
+#      
+#      sectoremissions <- emissions_chosenyear() %>%
+#        
+#      sectoremissions$annual_emissions[1]
+      
+#    })
+    
+##### TAB 1: TOTAL EMISSIONS BY YEAR #####
     
     # Output: Value box showing the total emissions in user-selected year
     output$totalannualemissions <- renderValueBox({
@@ -183,7 +200,7 @@ server <- function(input, output) {
                 icon = icon("leaf"), 
                 color = "green")
     })
-    
+
     # Output: bar graph of total emissions by year
     output$annualemissions <- renderPlot({
         ggplot(dcemissions_year, aes(x = year, y = totalemissions, 
@@ -200,8 +217,49 @@ server <- function(input, output) {
         theme_classic() + 
         theme(plot.title = element_text(hjust = 0.5, size = 18)) +
         theme(legend.position = "none")
-      
     })
+    
+
+##### TAB 2: TOTAL EMISSIONS BY SOURCE AND YEAR #####     
+    
+    # Output: Value box showing total emissions for user-selected source 
+#    output$emissions_sourcetotal <- renderValueBox({
+#      valueBox(emissions_chosenyear()$
+#               "Total Annual Emissions",
+#               icon = icon("bolt", lib = "font-awesome"),
+#               color = "green")
+#    })
+    
+    # Output: Value box showing emissions for selected source in selected year
+    
+        # Create a reactive Value to retrieve the total emissions for source in selected year
+        sourceemissions_chosenyear <- reactive({
+          req(input$selected_year, input$selected_source)
+        
+          sourcetotals_chosenyear <- emissions_chosenyear() %>%
+              group_by(source) %>%
+              filter(source == input$selected_source) %>%
+              select(source, source_emissions) %>%
+              unique()
+             
+        source_emissionsbyyear <- sourcetotals_chosenyear[2]
+        })    
+      
+        # Create value box showing total emissions for selected source and year
+        output$emissions_sourceyear <- renderValueBox({
+          valueBox(value = round(sourceemissions_chosenyear(),0),
+                   subtitle = paste0("Total Annual Emissions in ", input$selected_source, 
+                          " sector, in ", input$selected_year),
+                   icon = icon("star", lib = "font-awesome"),
+                   color = "green")
+        })
+        
+    
+    
+    
+    
+    
+    
     
 }
     
