@@ -325,7 +325,7 @@ server <- function(input, output) {
               select(sector, sector_emissions) %>%
               unique()
           
-          sectortotals_chosenyear[2]
+          sectortotals_chosenyear
         })    
         
         # Create value box showing total emissions for selected sector and year
