@@ -242,7 +242,7 @@ server <- function(input, output) {
               select(source, source_emissions) %>%
               unique()
              
-        source_emissionsbyyear <- sourcetotals_chosenyear[2]
+        sourcetotals_chosenyear[2]
         })    
       
         # Create value box showing total emissions for selected source and year
@@ -251,7 +251,7 @@ server <- function(input, output) {
                    subtitle = paste0("Total Annual Emissions in ", input$selected_source, 
                           " sector, in ", input$selected_year),
                    icon = icon("star", lib = "font-awesome"),
-                   color = "green")
+                   color = "yellow")
         })
         
     
