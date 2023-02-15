@@ -84,7 +84,7 @@ ui <- dashboardPage(
                 
     # Title
     dashboardHeader(title = "Washington D.C. Citywide Greenhouse Gas Emissions",
-                    titleWidth = 600),
+                    titleWidth = 650),
                 
     # Sidebar
     dashboardSidebar(
@@ -126,27 +126,36 @@ ui <- dashboardPage(
         )
     ),
                   
-    # Main Panel
-        dashboardBody(
-              
-              # Group 1: Total Emissions
-              
-              valueBoxOutput("totalannualemissions"),
-              valueBoxOutput("useryear"),
-              box(plotOutput("annualemissions")),
-              
-              # Group 2: Total Emissions by Source
-              valueBoxOutput("emissions_sourcetotal"),
-              valueBoxOutput("emissions_sourceyear"),
-              
-              # Group 3: Total Emissions by Sector
-              valueBoxOutput("emissions_sectortotal"),
-              valueBoxOutput("emissions_sectoryear")
-        )
+    # Body
+    dashboardBody(
+      tabItems(  
+        
+        # Group 1: Total Emissions
+        tabItem(tabName = "Emissions",
+                fluidRow(box(width = 12,
+                  valueBoxOutput("totalannualemissions", width = 6),
+                  valueBoxOutput("useryear", width = 6)
+                )),
+                fluidRow(
+                  box(width = 12, plotOutput("annualemissions"))
+                )),
+        
+        # Group 2: Total Emissions by Source
+        tabItem(tabName = "Sources",
+                fluidRow(box(width = 12,
+                  valueBoxOutput("emissions_sourcetotal"),
+                  valueBoxOutput("emissions_sourceyear")
+                ))),
+        
+        # Group 3: Total Emissions by Sector
+        tabItem(tabName = "Sectors",
+                fluidRow(box(width = 12, 
+                  valueBoxOutput("emissions_sectortotal"),
+                  valueBoxOutput("emissions_sectoryear")
+                )))
+      )
+    )
 )
-
-
-
 
 
 # Server
