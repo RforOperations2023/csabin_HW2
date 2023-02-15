@@ -175,9 +175,12 @@ ui <- dashboardPage(skin = "green",
                 ),
                 fluidRow(
                   box(
-                    width = 12
-                    "Data: Greenhouse Gas Emissions from Each Source, Across Years",
-                    DT::dataTableOutput("sourceemissions_table")
+                    width = 12,
+                    h4(strong("Data: Greenhouse Gas Emissions from Each Source, Across Years"),align = "center"),
+                    br(),
+                    br(),
+                    DT::dataTableOutput("sourceemissions_table"),
+                    collapsible = TRUE
                   )
                 )
           ),
@@ -194,8 +197,16 @@ ui <- dashboardPage(skin = "green",
                   box(width = 12, plotOutput("sectoremissions"))
                 ),
                 fluidRow(
-                  DT::dataTableOutput("sectoremissions_table")
-                ))
+                  box(
+                    width = 12, 
+                    h4(strong("Data: Greenhouse Gas Emissions from Each Sector, Across Years"), align = "center"),
+                    br(),
+                    br(),
+                    DT::dataTableOutput("sectoremissions_table"),
+                    collapsible = TRUE
+                  )
+                )
+          )
       )
     )
 )
