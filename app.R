@@ -80,14 +80,20 @@ dcemissions_year <- dcemissions %>%
 
 # User Interface
 
-ui <- fluidPage(
+ui <- dashboardPage(
                 
     # Title
-    title <- titlePanel("Washington D.C. Citywide Greenhouse Gas Emissions"),
+    dashboardHeader(title = "Washington D.C. Citywide Greenhouse Gas Emissions",
+                    titleWidth = 600),
                 
     # Sidebar
-    sidebarLayout(
-        sidebarPanel(width = 3,
+    dashboardSidebar(
+        sidebarMenu(id = "tabs",
+          
+            # Menu Items ----------------------------------------------
+            menuItem("Annual Emissions", icon = icon("leaf"), tabName = "Emissions"),
+            menuItem("Emission Sources", icon = icon("gas-pump"), tabName = "Sources"),
+            menuItem("Emission Sectors", icon = icon("building"), tabName = "Sectors"),
                     
             # Input: allow user to choose a range of years
             radioButtons(inputId = "selected_year", label = "Year: ",
@@ -117,16 +123,16 @@ ui <- fluidPage(
                                     "Incineration", "Kerosene", 
                                     "Landfill", "Natural Gas"),
                         selected = "Electricity")
-        ),
+        )
+    ),
                   
     # Main Panel
         dashboardBody(
               
               # Group 1: Total Emissions
-              box(
-                valueBoxOutput("totalannualemissions"),
-                valueBoxOutput("useryear")
-                 ),
+              
+              valueBoxOutput("totalannualemissions"),
+              valueBoxOutput("useryear"),
               box(plotOutput("annualemissions")),
               
               # Group 2: Total Emissions by Source
@@ -137,8 +143,8 @@ ui <- fluidPage(
               valueBoxOutput("emissions_sectortotal"),
               valueBoxOutput("emissions_sectoryear")
         )
-    )
 )
+
 
 
 
@@ -313,30 +319,30 @@ server <- function(input, output) {
     # Output: Value box showing emissions by selected sector in selected year
         
         # Create a reactive Value to retrieve the total emissions for sector in selected year
-        sectoremissions_chosenyear <- reactive({
-          req(input$selected_year, input$selected_sector)
+#        sectoremissions_chosenyear <- reactive({
+#          req(input$selected_year, input$selected_sector)
           
-          sectortotals_chosenyear <-  dcemissions %>%
-              filter(year == input$selected_year) %>%
-              group_by(sector, year) %>%
-              mutate(sector_emissions = sum(emissions, na.rm = TRUE)) %>%
-              ungroup() %>%
-              filter(sector == input$selected_sector) %>%
-              select(sector, sector_emissions) %>%
-              unique()
-          
-          sectortotals_chosenyear[2]
-        })    
+#          sectortotals_chosenyear <-  dcemissions %>%
+#              filter(year == input$selected_year) %>%
+#              group_by(sector, year) %>%
+#              mutate(sector_emissions = sum(emissions, na.rm = TRUE)) %>%
+#              ungroup() %>%
+#              filter(sector == input$selected_sector) %>%
+#              select(sector, sector_emissions) %>%
+#              unique()
+#          
+#          sectortotals_chosenyear[2]
+#        })    
         
         # Create value box showing total emissions for selected sector and year
-        output$emissions_sectoryear <- renderValueBox({
-          valueBox(value = prettyNum(round(sectoremissions_chosenyear(),0),
-                                     big.mark = ","),
-                   subtitle = paste0("Emissions from ", input$selected_sector, 
-                                     " Sector in ", input$selected_year),
-                   icon = icon("truck", lib = "font-awesome"),
-                   color = "blue")
-        })
+#        output$emissions_sectoryear <- renderValueBox({
+#          valueBox(value = prettyNum(round(sectoremissions_chosenyear(),0),
+#                                     big.mark = ","),
+#                   subtitle = paste0("Emissions from ", input$selected_sector, 
+#                                     " Sector in ", input$selected_year),
+#                   icon = icon("truck", lib = "font-awesome"),
+#                   color = "blue")
+#        })
         
   
     
