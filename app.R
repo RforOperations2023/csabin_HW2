@@ -325,8 +325,8 @@ server <- function(input, output) {
             filter(source == input$selected_source)
         })
         
-    output$sourceemissions <- renderPlot({
-        ggplot(data = read_source(), aes(x = year, y = emissions)) + 
+       output$sourceemissions <- renderPlot({
+          ggplot(data = read_source(), aes(x = year, y = emissions)) + 
               geom_col(aes(fill = factor(
                               ifelse(year == input$selected_year, 
                               "Highlighted", "Normal"))
@@ -341,6 +341,12 @@ server <- function(input, output) {
               theme(legend.position = "none")
       })
 
+       
+    # Output: data table showing total emissions by year within user-selected source
+       output$sourceemissions_table <- DT::renderDataTable({
+        DT::datatable(data = read_source()[c(1:2,4)])
+      })
+       
         
 ##### TAB 3: TOTAL EMISSIONS BY SECTOR AND YEAR #####     
         
@@ -427,7 +433,12 @@ server <- function(input, output) {
           theme(plot.title = element_text(hjust = 0.5, size = 18)) + 
           theme(legend.position = "none")
         })
+
         
+    # Output: data table showing total emissions by year within user-selected sector
+        output$sectoremissions_table <- DT::renderDataTable({
+          DT::datatable(data = read_sector()[c(1:2,4)])
+        })
     
 }
     
