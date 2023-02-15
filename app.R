@@ -169,7 +169,10 @@ ui <- dashboardPage(
                 fluidRow(box(width = 12, 
                   valueBoxOutput("emissions_sectortotal", width = 6),
                   valueBoxOutput("emissions_sectoryear", width = 6)
-                )))
+                )),
+                fluidRow(
+                  box(width = 12, plotOutput("sectoremissions"))
+                ))
       )
     )
 )
@@ -312,7 +315,7 @@ server <- function(input, output) {
                    color = "yellow")
         })
         
-    # Output: bar graph of total emissions by year within user-selected sector
+    # Output: bar graph of total emissions by year within user-selected source
       
         read_source <- reactive({
             req(input$selected_source)
@@ -397,13 +400,33 @@ server <- function(input, output) {
                    color = "blue")
         })
         
-
+    # Output: bar graph of total emissions by year within user-selected sector
         
-  
-    
-    
-    
-    
+        read_sector <- reactive({
+          req(input$selected_sector)
+          
+          dcemissions_sectors %>%
+            filter(sector == input$selected_sector)
+        })
+        
+        output$sectoremissions <- renderPlot({
+          ggplot(data = read_sector(), 
+                 aes(x = year, y = emissions)) + 
+            geom_col(aes(fill = factor(
+                            ifelse(year == input$selected_year,
+                                   "Highlighted", "Normal"))
+                        )
+            ) + 
+          labs(title = paste0("Greenhouse Gas Emissions in the ", input$selected_sector,
+                              " Sector")) + 
+          xlab("Year") + ylab("Emissions (tons)") + 
+          scale_y_continuous(labels = comma) + 
+          scale_fill_manual(values = c("#0075bd", "grey80")) + 
+          theme_classic() + 
+          theme(plot.title = element_text(hjust = 0.5, size = 18)) + 
+          theme(legend.position = "none")
+        })
+        
     
 }
     
