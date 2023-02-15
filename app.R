@@ -343,11 +343,28 @@ server <- function(input, output) {
 
        
     # Output: data table showing total emissions by year within user-selected source
+       totalsourceemissions <- reactive({
+         req(input$selected_source)
+         
+         dcsources <- dcemissions_sources %>%
+           select(source, year, source_emissions) %>%
+           filter(source == input$selected_source) %>%
+           unique()
+         
+         dcsources$source_emissions <- prettyNum(dcsources$source_emissions,
+                                                 big.mark = ",")
+         colnames(dcsources) <- c("Energy Source", "Year", "Total Source Emissions")
+         
+         dcsources
+       })
+       
+       
+       
        output$sourceemissions_table <- DT::renderDataTable({
-        DT::datatable(data = read_source()[c(1:2,4)])
+        DT::datatable(data = totalsourceemissions())
       })
        
-        
+         
 ##### TAB 3: TOTAL EMISSIONS BY SECTOR AND YEAR #####     
         
     # Output: Value box showing emissions by selected sector 
@@ -436,8 +453,23 @@ server <- function(input, output) {
 
         
     # Output: data table showing total emissions by year within user-selected sector
+        totalsectoremissions <- reactive({
+          req(input$selected_sector)
+          
+          dcsectors <- dcemissions_sectors %>%
+            select(sector, year, sector_emissions) %>%
+            filter(sector == input$selected_sector) %>%
+            unique()
+          
+          dcsectors$sector_emissions <- prettyNum(dcsectors$sector_emissions,
+                                                  big.mark = ",")
+          colnames(dcsectors) <- c("Sector", "Year", "Total Sector Emissions")
+          
+          dcsectors
+        })
+
         output$sectoremissions_table <- DT::renderDataTable({
-          DT::datatable(data = read_sector()[c(1:2,4)])
+          DT::datatable(data = totalsectoremissions())
         })
     
 }
