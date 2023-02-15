@@ -94,7 +94,7 @@ dcemissions_sectors <- data.frame(dcemissions_sectors)
 
 # User Interface
 
-ui <- dashboardPage(
+ui <- dashboardPage(skin = "green",
                 
     # Title
     dashboardHeader(title = "Washington D.C. Citywide Greenhouse Gas Emissions",
@@ -146,10 +146,16 @@ ui <- dashboardPage(
         
         # Group 1: Total Emissions
         tabItem(tabName = "Emissions",
-                fluidRow(box(width = 12,
-                  valueBoxOutput("totalannualemissions", width = 6),
-                  valueBoxOutput("useryear", width = 6)
-                )),
+                fluidRow(
+                  box(
+                    title = h4(strong("Total Greenhouse Gas Emissions"), align = "center"),
+                    width = 12, 
+                    
+                    br(),
+                    infoBoxOutput("useryear", width = 6),
+                    valueBoxOutput("totalannualemissions", width = 6)
+                  )
+                ),
                 fluidRow(
                   box(width = 12, plotOutput("annualemissions"))
                 )),
@@ -230,17 +236,18 @@ server <- function(input, output) {
     output$totalannualemissions <- renderValueBox({
         valueBox(comma(round(annualemissions_chosenyear(), 0)), 
                  "Total Annual Emissions",
-                 icon = icon("bolt", lib = "font-awesome"),
+                 icon = icon("leaf", lib = "font-awesome"),
                  color = "green")
     })  
 
     
     # Output: Info box showing the user-selected year
-    output$useryear <- renderValueBox({
-        valueBox(value = input$selected_year,
-                "Year (selected by the user)",
-                icon = icon("leaf"), 
-                color = "green")
+    output$useryear <- renderInfoBox({
+        infoBox(title = "Year",
+                value = h5(strong(input$selected_year), style = "font-size:40px;"),
+                subtitle = "selected by the user",
+                icon = icon("calendar"), 
+                color = "green", fill = FALSE)
     })
 
     # Output: bar graph of total emissions by year
@@ -310,11 +317,14 @@ server <- function(input, output) {
         output$emissions_sourceyear <- renderValueBox({
           valueBox(value = prettyNum(round(sourceemissions_chosenyear(),0),
                                      big.mark = ","),
-                   subtitle = paste0("Emissions from ", input$selected_source, 
-                          " in ", input$selected_year),
+                   subtitle = paste0("Emissions from ", input$selected_source,
+                                     " in ", input$selected_year),
                    icon = icon("fire", lib = "font-awesome"),
                    color = "yellow")
+          
         })
+        
+
         
     # Output: bar graph of total emissions by year within user-selected source
       
