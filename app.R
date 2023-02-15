@@ -148,7 +148,7 @@ ui <- dashboardPage(skin = "green",
         tabItem(tabName = "Emissions",
                 fluidRow(
                   box(
-                    title = h4(strong("Total Greenhouse Gas Emissions"), align = "center"),
+                    title = h4(strong("Total Greenhouse Gas Emissions (tons)"), align = "center"),
                     width = 12, 
                     br(),
                     infoBoxOutput("useryear", width = 6),
@@ -163,11 +163,11 @@ ui <- dashboardPage(skin = "green",
         tabItem(tabName = "Sources",
                 fluidRow(
                   box(
-                    title = h4(strong("Greenhouse Gas Emissions from Various Sources"), align = "center"),
+                    title = h4(strong("Greenhouse Gas Emissions from Various Sources (in tons)"), align = "center"),
                     width = 12,
                     br(), 
                     valueBoxOutput("emissions_sourceyear", width = 6),
-                    valueBoxOutput("emissions_sourcetotal", width = 6)
+                    infoBoxOutput("emissions_sourcetotal", width = 6)
                   )
                 ),
                 fluidRow(
@@ -176,7 +176,7 @@ ui <- dashboardPage(skin = "green",
                 fluidRow(
                   box(
                     width = 12,
-                    h4(strong("Data: Greenhouse Gas Emissions from Each Source, Across Years"),align = "center"),
+                    h4(strong("Data: Greenhouse Gas Emissions (tons) from Each Source, Across Years"),align = "center"),
                     br(),
                     br(),
                     DT::dataTableOutput("sourceemissions_table"),
@@ -188,9 +188,12 @@ ui <- dashboardPage(skin = "green",
         # Group 3: Total Emissions by Sector
         tabItem(tabName = "Sectors",
                 fluidRow(
-                  box(width = 12, 
-                    valueBoxOutput("emissions_sectortotal", width = 6),
-                    valueBoxOutput("emissions_sectoryear", width = 6)
+                  box(
+                    title = h4(strong("Greenhouse Gasses Emitted by Various Sectors (in tons)"), align = "center"),
+                    width = 12, 
+                    br(),
+                    valueBoxOutput("emissions_sectoryear", width = 6),
+                    infoBoxOutput("emissions_sectortotal", width = 6)
                   )
                 ),
                 fluidRow(
@@ -199,7 +202,7 @@ ui <- dashboardPage(skin = "green",
                 fluidRow(
                   box(
                     width = 12, 
-                    h4(strong("Data: Greenhouse Gas Emissions from Each Sector, Across Years"), align = "center"),
+                    h4(strong("Data: Greenhouse Gas Emissions (tons) from Each Sector, Across Years"), align = "center"),
                     br(),
                     br(),
                     DT::dataTableOutput("sectoremissions_table"),
@@ -263,9 +266,8 @@ server <- function(input, output) {
     output$useryear <- renderInfoBox({
         infoBox(title = "Year",
                 value = h5(strong(input$selected_year), style = "font-size:40px;"),
-                subtitle = "selected by the user",
                 icon = icon("calendar"), 
-                color = "green", fill = FALSE)
+                color = "green", fill = TRUE)
     })
 
     # Output: bar graph of total emissions by year
@@ -280,7 +282,7 @@ server <- function(input, output) {
         labs(title = "Annual Greenhouse Gas Emissions in Washington D.C.") +
         xlab("Year") + ylab("Emissions (millions of tons)") + 
         scale_y_continuous(labels = label_number(scale = 0.000001)) + 
-        scale_fill_manual(values = c("#1d8d43","grey80")) + 
+        scale_fill_manual(values = c("#00a951","grey80")) + 
         theme_classic() + 
         theme(plot.title = element_text(hjust = 0.5, size = 18)) +
         theme(legend.position = "none")
@@ -289,7 +291,7 @@ server <- function(input, output) {
 
 ##### TAB 2: TOTAL EMISSIONS BY SOURCE AND YEAR #####     
     
-    # Output: Value box showing emissions by selected source 
+    # Output: Info box showing emissions by selected source 
     
         # Create a reactive Value to retrieve the total emissions for source across all years
         emissions_chosensource <- reactive({
@@ -305,16 +307,16 @@ server <- function(input, output) {
           source_allyears[2]
         })  
         
-        # Create value box showing total emissions for selected source and year
-        output$emissions_sourcetotal <- renderValueBox({
-          valueBox(value = prettyNum(round(emissions_chosensource(),0),
-                                     big.mark = ","),
-                   subtitle = paste0("Total Emissions from ", input$selected_source, 
-                                     ", 2006 to 2020"),
-                   icon = icon("gas-pump", lib = "font-awesome"),
-                   color = "yellow")
+        # Create info box showing total emissions for selected source and year
+        output$emissions_sourcetotal <- renderInfoBox({
+          infoBox(value = h5(strong(prettyNum(round(emissions_chosensource(),0),
+                                     big.mark = ",")), style = "font-size:35px;"),
+                   title = "Total Emissions",
+                   subtitle = paste0(toupper(input$selected_source), ":  2006 to 2020"),
+                   icon = icon("leaf", lib = "font-awesome"),
+                   color = "yellow", fill = TRUE)
         })
-    
+        
         
     # Output: Value box showing emissions by selected source in selected year
     
@@ -337,7 +339,7 @@ server <- function(input, output) {
                                      big.mark = ","),
                    subtitle = paste0("Emissions from ", input$selected_source,
                                      " in ", input$selected_year),
-                   icon = icon("fire", lib = "font-awesome"),
+                   icon = icon("gas-pump", lib = "font-awesome"),
                    color = "yellow")
           
         })
@@ -395,7 +397,7 @@ server <- function(input, output) {
          
 ##### TAB 3: TOTAL EMISSIONS BY SECTOR AND YEAR #####     
         
-    # Output: Value box showing emissions by selected sector 
+    # Output: Info box showing emissions by selected sector 
         
         # Create a reactive Value to retrieve the total emissions for sector across all years
         emissions_chosensector <- reactive({
@@ -411,14 +413,14 @@ server <- function(input, output) {
           sector_allyears[2]
         })  
         
-        # Create value box showing total emissions for selected sector and year
-        output$emissions_sectortotal <- renderValueBox({
-          valueBox(value = prettyNum(round(emissions_chosensector(),0),
-                                     big.mark = ","),
-                   subtitle = paste0("Total Emissions from ", input$selected_sector, 
-                                     " Sector, 2006 to 2020"),
-                   icon = icon("building", lib = "font-awesome"),
-                   color = "blue")
+        # Create info box showing total emissions for selected sector and year
+        output$emissions_sectortotal <- renderInfoBox({
+          infoBox(value = h5(strong(prettyNum(round(emissions_chosensector(),0),
+                                     big.mark = ",")), style = "font-size:35px;"),
+                  title = "Total Emissions",
+                  subtitle = paste0(toupper(input$selected_sector), ":  2006 to 2020"),
+                   icon = icon("leaf", lib = "font-awesome"),
+                   color = "blue", fill = TRUE)
         })
         
     
@@ -448,7 +450,7 @@ server <- function(input, output) {
                                      big.mark = ","),
                    subtitle = paste0("Emissions from ", input$selected_sector,
                                      " Sector in ", input$selected_year),
-                   icon = icon("truck", lib = "font-awesome"),
+                   icon = icon("building", lib = "font-awesome"),
                    color = "blue")
         })
         
