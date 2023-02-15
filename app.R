@@ -167,8 +167,8 @@ ui <- dashboardPage(
         # Group 3: Total Emissions by Sector
         tabItem(tabName = "Sectors",
                 fluidRow(box(width = 12, 
-                  valueBoxOutput("emissions_sectortotal"),
-                  valueBoxOutput("emissions_sectoryear")
+                  valueBoxOutput("emissions_sectortotal", width = 6),
+                  valueBoxOutput("emissions_sectoryear", width = 6)
                 )))
       )
     )
@@ -370,30 +370,34 @@ server <- function(input, output) {
     # Output: Value box showing emissions by selected sector in selected year
         
         # Create a reactive Value to retrieve the total emissions for sector in selected year
-#        sectoremissions_chosenyear <- reactive({
-#          req(input$selected_year, input$selected_sector)
+        sectoremissions_chosenyear <- reactive({
+          req(input$selected_year, input$selected_sector)
           
-#          sectortotals_chosenyear <-  dcemissions %>%
-#              filter(year == input$selected_year) %>%
-#              group_by(sector, year) %>%
-#              mutate(sector_emissions = sum(emissions, na.rm = TRUE)) %>%
-#              ungroup() %>%
-#              filter(sector == input$selected_sector) %>%
-#              select(sector, sector_emissions) %>%
-#              unique()
-#          
-#          sectortotals_chosenyear[2]
-#        })    
+          sectortotals_chosenyear <- dcemissions %>%
+            filter(year == input$selected_year) %>%
+            group_by(sector, year) %>%
+            mutate(sector_emissions = sum(emissions, na.rm = TRUE)) %>%
+            ungroup() %>%
+            filter(sector == input$selected_sector) %>%
+            select(sector, sector_emissions) %>%
+            unique()
+          
+          sectortotals_chosenyear[2]
+
+        })
+        
         
         # Create value box showing total emissions for selected sector and year
-#        output$emissions_sectoryear <- renderValueBox({
-#          valueBox(value = prettyNum(round(sectoremissions_chosenyear(),0),
-#                                     big.mark = ","),
-#                   subtitle = paste0("Emissions from ", input$selected_sector, 
-#                                     " Sector in ", input$selected_year),
-#                   icon = icon("truck", lib = "font-awesome"),
-#                   color = "blue")
-#        })
+        output$emissions_sectoryear <- renderValueBox({
+          valueBox(value = prettyNum(round(sectoremissions_chosenyear(),0),
+                                     big.mark = ","),
+                   subtitle = paste0("Emissions from ", input$selected_sector,
+                                     " Sector in ", input$selected_year),
+                   icon = icon("truck", lib = "font-awesome"),
+                   color = "blue")
+        })
+        
+
         
   
     
