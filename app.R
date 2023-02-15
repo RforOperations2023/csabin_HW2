@@ -150,7 +150,6 @@ ui <- dashboardPage(skin = "green",
                   box(
                     title = h4(strong("Total Greenhouse Gas Emissions"), align = "center"),
                     width = 12, 
-                    
                     br(),
                     infoBoxOutput("useryear", width = 6),
                     valueBoxOutput("totalannualemissions", width = 6)
@@ -163,18 +162,26 @@ ui <- dashboardPage(skin = "green",
         # Group 2: Total Emissions by Source
         tabItem(tabName = "Sources",
                 fluidRow(
-                  box(width = 12,
-                      valueBoxOutput("emissions_sourcetotal", width = 6),
-                      valueBoxOutput("emissions_sourceyear", width = 6)
+                  box(
+                    title = h4(strong("Greenhouse Gas Emissions from Various Sources"), align = "center"),
+                    width = 12,
+                    br(), 
+                    valueBoxOutput("emissions_sourceyear", width = 6),
+                    valueBoxOutput("emissions_sourcetotal", width = 6)
                   )
                 ),
                 fluidRow(
                   box(width = 12, plotOutput("sourceemissions"))
                 ),
                 fluidRow(
-                  DT::dataTableOutput("sourceemissions_table")
-                )),
-        
+                  box(
+                    width = 12
+                    "Data: Greenhouse Gas Emissions from Each Source, Across Years",
+                    DT::dataTableOutput("sourceemissions_table")
+                  )
+                )
+          ),
+
         # Group 3: Total Emissions by Sector
         tabItem(tabName = "Sectors",
                 fluidRow(
