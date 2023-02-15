@@ -72,8 +72,22 @@ dcemissions_year <- dcemissions %>%
                         mutate(totalemissions = sum(emissions, na.rm = TRUE)) %>%
                         select(year, totalemissions) %>%
                         unique()
-                        
-                          
+
+# Create subset showing total emissions for each source in each year
+dcemissions_sources <- dcemissions %>%
+                       group_by(source, year) %>%
+                       mutate(source_emissions = sum(emissions, na.rm = TRUE)) %>%
+                       select(source, year, source_emissions, emissions) %>%
+                       unique()
+dcemissions_sources <- data.frame(dcemissions_sources)
+
+# Create subset showing total emissions for each source in each year
+dcemissions_sectors <- dcemissions %>%
+                       group_by(sector, year) %>%
+                       mutate(sector_emissions = sum(emissions, na.rm = TRUE)) %>%
+                       select(sector, year, sector_emissions, emissions) %>%
+                       unique()                          
+dcemissions_sectors <- data.frame(dcemissions_sectors)
                           
 
 ##### SHINY APP CHUNKS #####
@@ -143,9 +157,12 @@ ui <- dashboardPage(
         # Group 2: Total Emissions by Source
         tabItem(tabName = "Sources",
                 fluidRow(box(width = 12,
-                  valueBoxOutput("emissions_sourcetotal"),
-                  valueBoxOutput("emissions_sourceyear")
-                ))),
+                  valueBoxOutput("emissions_sourcetotal", width = 6),
+                  valueBoxOutput("emissions_sourceyear", width = 6)
+                )),
+                fluidRow(
+                  box(width = 12, plotOutput("sourceemissions"))
+                )),
         
         # Group 3: Total Emissions by Sector
         tabItem(tabName = "Sectors",
@@ -269,7 +286,7 @@ server <- function(input, output) {
                    color = "yellow")
         })
     
-  
+        
     # Output: Value box showing emissions by selected source in selected year
     
         # Create a reactive Value to retrieve the total emissions for source in selected year
@@ -295,7 +312,32 @@ server <- function(input, output) {
                    color = "yellow")
         })
         
+    # Output: bar graph of total emissions by year within user-selected sector
+      
+        read_source <- reactive({
+            req(input$selected_source)
+          
+            dcemissions_sources %>%
+            filter(source == input$selected_source)
+        })
+        
+    output$sourceemissions <- renderPlot({
+        ggplot(data = read_source(), aes(x = year, y = emissions)) + 
+              geom_col(aes(fill = factor(
+                              ifelse(year == input$selected_year, 
+                              "Highlighted", "Normal"))
+                           )
+                      ) + 
+              labs(title = paste0("Greenhouse Gas Emissions from ", input$selected_source)) +
+              xlab("Year") + ylab("Emissions (tons)") +
+              scale_y_continuous(labels = comma) +
+              scale_fill_manual(values = c("#fb9504","grey80")) + 
+              theme_classic() + 
+              theme(plot.title = element_text(hjust = 0.5, size = 18)) +
+              theme(legend.position = "none")
+      })
 
+        
 ##### TAB 3: TOTAL EMISSIONS BY SECTOR AND YEAR #####     
         
     # Output: Value box showing emissions by selected sector 
