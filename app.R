@@ -98,7 +98,7 @@ ui <- dashboardPage(skin = "green",
                 
     # Title
     dashboardHeader(title = "Washington D.C. Citywide Greenhouse Gas Emissions",
-                    titleWidth = 650),
+                    titleWidth = 500),
                 
     # Sidebar
     dashboardSidebar(
