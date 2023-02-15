@@ -156,22 +156,32 @@ ui <- dashboardPage(
         
         # Group 2: Total Emissions by Source
         tabItem(tabName = "Sources",
-                fluidRow(box(width = 12,
-                  valueBoxOutput("emissions_sourcetotal", width = 6),
-                  valueBoxOutput("emissions_sourceyear", width = 6)
-                )),
+                fluidRow(
+                  box(width = 12,
+                      valueBoxOutput("emissions_sourcetotal", width = 6),
+                      valueBoxOutput("emissions_sourceyear", width = 6)
+                  )
+                ),
                 fluidRow(
                   box(width = 12, plotOutput("sourceemissions"))
+                ),
+                fluidRow(
+                  DT::dataTableOutput("sourceemissions_table")
                 )),
         
         # Group 3: Total Emissions by Sector
         tabItem(tabName = "Sectors",
-                fluidRow(box(width = 12, 
-                  valueBoxOutput("emissions_sectortotal", width = 6),
-                  valueBoxOutput("emissions_sectoryear", width = 6)
-                )),
+                fluidRow(
+                  box(width = 12, 
+                    valueBoxOutput("emissions_sectortotal", width = 6),
+                    valueBoxOutput("emissions_sectoryear", width = 6)
+                  )
+                ),
                 fluidRow(
                   box(width = 12, plotOutput("sectoremissions"))
+                ),
+                fluidRow(
+                  DT::dataTableOutput("sectoremissions_table")
                 ))
       )
     )
@@ -182,49 +192,40 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
     
-    # Create a reactive subset containing data from the user-selected year
-    # Add three columns: total emissions by source, by sector, and by year
-    emissions_chosenyear <- reactive({
-        req(input$selected_year)
-      
-        sector_chosenyear <- dcemissions %>% 
-            filter(year == input$selected_year) %>%
-            group_by(sector, year) %>%
-            mutate(sector_emissions = sum(emissions, na.rm = TRUE)) %>% 
-            ungroup() 
-      
-        source_chosenyear <- sector_chosenyear %>%
-            filter(year == input$selected_year) %>%
-            group_by(source, year) %>%
-            mutate(source_emissions = sum(emissions, na.rm = TRUE)) %>%
-            ungroup()
-        
-        total_chosenyear <- source_chosenyear %>%
-            filter(year == input$selected_year) %>%
-            group_by(year) %>%
-            mutate(annual_emissions = sum(emissions, na.rm = TRUE))
-    })
-    
-    # Create a reactive Value to retrieve the annual emissions for selected year
-    annualemissions_chosenyear <- reactive({
-        req(input$selected_year)
-      
-        totalemissions <- emissions_chosenyear()
-        totalemissions$annual_emissions[1]
-    })
-    
-#    # Create a table to produce table of annual emissions by sector
-#    annualemissions_chosenyear <- reactive({
-#      req(input$selected_year)
-#      
-#      sectoremissions <- emissions_chosenyear() %>%
-#        
-#      sectoremissions$annual_emissions[1]
-      
-#    })
     
 ##### TAB 1: TOTAL EMISSIONS BY YEAR #####
     
+    # Create a reactive subset containing data from the user-selected year
+    # Add three columns: total emissions by source, by sector, and by year
+      emissions_chosenyear <- reactive({
+        req(input$selected_year)
+        
+        sector_chosenyear <- dcemissions %>% 
+          filter(year == input$selected_year) %>%
+          group_by(sector, year) %>%
+          mutate(sector_emissions = sum(emissions, na.rm = TRUE)) %>% 
+          ungroup() 
+        
+        source_chosenyear <- sector_chosenyear %>%
+          filter(year == input$selected_year) %>%
+          group_by(source, year) %>%
+          mutate(source_emissions = sum(emissions, na.rm = TRUE)) %>%
+          ungroup()
+        
+        total_chosenyear <- source_chosenyear %>%
+          filter(year == input$selected_year) %>%
+          group_by(year) %>%
+          mutate(annual_emissions = sum(emissions, na.rm = TRUE))
+      })
+    
+    # Create a reactive Value to retrieve the annual emissions for selected year
+      annualemissions_chosenyear <- reactive({
+        req(input$selected_year)
+        
+        totalemissions <- emissions_chosenyear()
+        totalemissions$annual_emissions[1]
+      })
+
     # Output: Value box showing the total emissions in user-selected year
     output$totalannualemissions <- renderValueBox({
         valueBox(comma(round(annualemissions_chosenyear(), 0)), 
