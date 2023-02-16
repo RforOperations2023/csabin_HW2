@@ -15,7 +15,7 @@ library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
 library(scales)
-
+library(plotly)
 
 # Load data from directory -------------------------------------------------
 ghg_inventory <- read.csv("Greenhouse_Gas_Inventory.csv")
@@ -156,7 +156,7 @@ ui <- dashboardPage(skin = "green",
                   )
                 ),
                 fluidRow(
-                  box(width = 12, plotOutput("annualemissions"))
+                  box(width = 12, plotlyOutput("annualemissions"))
                 )),
         
         # Group 2: Total Emissions by Source
@@ -171,7 +171,7 @@ ui <- dashboardPage(skin = "green",
                   )
                 ),
                 fluidRow(
-                  box(width = 12, plotOutput("sourceemissions"))
+                  box(width = 12, plotlyOutput("sourceemissions"))
                 ),
                 fluidRow(
                   box(
@@ -197,7 +197,7 @@ ui <- dashboardPage(skin = "green",
                   )
                 ),
                 fluidRow(
-                  box(width = 12, plotOutput("sectoremissions"))
+                  box(width = 12, plotlyOutput("sectoremissions"))
                 ),
                 fluidRow(
                   box(
@@ -271,13 +271,14 @@ server <- function(input, output) {
     })
 
     # Output: bar graph of total emissions by year
-    output$annualemissions <- renderPlot({
-        ggplot(dcemissions_year, aes(x = year, y = totalemissions, 
+    output$annualemissions <- renderPlotly({
+        ggplotly(
+          ggplot(dcemissions_year, aes(x = year, y = totalemissions, 
                                      fill = factor(
                                        ifelse(year == input$selected_year, 
                                               "Highlighted", "Normal")
                                      )
-               )) + 
+               ))+ 
         geom_col() + 
         labs(title = "Annual Greenhouse Gas Emissions in Washington D.C.") +
         xlab("Year") + ylab("Emissions (millions of tons)") + 
@@ -285,7 +286,8 @@ server <- function(input, output) {
         scale_fill_manual(values = c("#00a951","grey80")) + 
         theme_classic() + 
         theme(plot.title = element_text(hjust = 0.5, size = 18)) +
-        theme(legend.position = "none")
+        theme(legend.position = "none"),
+        tooltip = c("year", "totalemissions"))
     })
     
 
@@ -355,20 +357,22 @@ server <- function(input, output) {
             filter(source == input$selected_source)
         })
         
-       output$sourceemissions <- renderPlot({
-          ggplot(data = read_source(), aes(x = year, y = emissions)) + 
+       output$sourceemissions <- renderPlotly({
+          ggplotly(
+            ggplot(data = read_source(), aes(x = year, y = emissions)) + 
               geom_col(aes(fill = factor(
                               ifelse(year == input$selected_year, 
                               "Highlighted", "Normal"))
                            )
-                      ) + 
+                      )+ 
               labs(title = paste0("Greenhouse Gas Emissions from ", input$selected_source)) +
               xlab("Year") + ylab("Emissions (tons)") +
               scale_y_continuous(labels = comma) +
               scale_fill_manual(values = c("#fb9504","grey80")) + 
               theme_classic() + 
               theme(plot.title = element_text(hjust = 0.5, size = 18)) +
-              theme(legend.position = "none")
+              theme(legend.position = "none"),
+         tooltip = c("year", "emissions"))
       })
 
        
@@ -463,8 +467,9 @@ server <- function(input, output) {
             filter(sector == input$selected_sector)
         })
         
-        output$sectoremissions <- renderPlot({
-          ggplot(data = read_sector(), 
+        output$sectoremissions <- renderPlotly({
+          ggplotly(
+            ggplot(data = read_sector(), 
                  aes(x = year, y = emissions)) + 
             geom_col(aes(fill = factor(
                             ifelse(year == input$selected_year,
@@ -478,7 +483,8 @@ server <- function(input, output) {
           scale_fill_manual(values = c("#0075bd", "grey80")) + 
           theme_classic() + 
           theme(plot.title = element_text(hjust = 0.5, size = 18)) + 
-          theme(legend.position = "none")
+          theme(legend.position = "none"),
+          tooltip = c("year", "emissions"))
         })
 
         
